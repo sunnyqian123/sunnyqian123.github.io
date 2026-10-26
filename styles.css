@@ -7,3 +7,7 @@ main{max-width:1600px}.portal-layout{display:grid;grid-template-columns:minmax(0
 @media(max-width:680px){.portal-content .intro{flex-direction:column;align-items:flex-start;gap:16px}.portal-content .intro>div{min-width:0}.portal-content .intro>.badge{white-space:normal}}
 
 .preview-actions{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
+/* Make client/agent login switching readable and easy to tap. */
+#switch-login,#agent-login,#preview-login{font-size:16px;font-weight:700;line-height:1.4;min-height:44px}
+#switch-login{display:block;margin-top:6px;padding:8px 0;text-underline-offset:3px}
+@media(max-width:480px){.preview-banner{flex-direction:column;align-items:stretch}.preview-actions{flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:10px}}
