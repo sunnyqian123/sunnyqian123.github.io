@@ -1,0 +1,181 @@
+AI USAGE LOG
+Unit 2 Project: Concord Desk — Interactive Real Estate Web Application
+
+ABOUT THIS LOG
+Concord Desk is my classroom prototype for a real estate reception website in Concord, Massachusetts. I wanted to explore whether clients could arrange calls, meetings, and scheduled emails through one website while agents managed those requests from a separate workspace. All people and communications in the demo are fictional.
+
+This log is organized into the four areas in the assignment. The example prompts in Section 2 are reconstructed from my project idea and the website's actual features. They explain the development process, but they are not a verbatim conversation record. Actual excerpts from my messages are labeled separately. Response summaries describe the implementation and documented development work, not invented quotations from the AI.
+
+======================================================================
+1. AI TOOLING DISCLOSURE
+======================================================================
+AI tool used: Codex.
+
+I used Codex to help plan the website, generate HTML, CSS, and JavaScript, improve the interface, review bugs, run checks, and prepare the project files and documentation. Codex generated substantial parts of the website code. My role was to choose the real estate idea, provide the assignment requirements, decide how clients and agents should use the website, and request revisions when the behavior did not match what I wanted.
+
+At first, I mainly focused on getting the website working. As I reviewed the project requirements, I became more interested in how the different choices affected the experience. For example, I wanted the booking form to change depending on why someone was contacting the agency, rather than asking everyone the same questions. I also questioned who should be able to see the agent workspace.
+
+This log does not claim that I independently wrote all the code or performed the checks that Codex reported. I still need to be able to explain the submitted code myself.
+
+======================================================================
+2. PROMPT ENGINEERING EXAMPLES: BUILDING THE WEBSITE
+======================================================================
+The following four rounds are reconstructed example prompts. They organize the requirements into more focused requests and explain the resulting features. They should not be read as exact historical messages.
+
+ROUND 1 — DEFINING THE IDEA
+Reconstructed example prompt:
+“Help me build a classroom website called Concord Desk using HTML, CSS, and JavaScript. It should act like a reception desk for a fictional real estate agency in Concord, Massachusetts. Clients should be able to request phone calls, meetings, and scheduled emails. Agents should have a separate page to manage those requests. Use fake clients and simulated messages, because this is a school prototype rather than a real agency service. Give it a light green color palette and a clean card layout.”
+
+Implementation summary:
+The website has a client view and an agent workspace inside one application. The client side focuses on making and reviewing requests. The agent side focuses on the shared request list, responses, statuses, and a chart. The design uses light green surfaces, cards, and consistent controls. Calls and emails are simulated inside the app.
+
+ROUND 2 — MAKING THE APP INTERACTIVE
+Reconstructed example prompt:
+“I want this to be more than a static website. Save the fictional appointments when the page reloads. Let users choose an agent, date, and time, and give feedback if a time is already taken. Add a chart that updates when the appointment data changes. Include clear feedback for saving, errors, successful actions, and empty lists.”
+
+Implementation summary:
+The app keeps request data in localStorage. JavaScript checks dates and appointment conflicts and recalculates the available slots. The agent chart is derived from the request list, so it changes with the data. The interface includes a saving state, validation messages, success notifications, and empty states.
+
+ROUND 3 — CONNECTING CLIENTS AND AGENTS
+Reconstructed example prompt:
+“Add fictional client and agent accounts. A client should create bookings and see their own requests. An agent should manage the agency's requests and respond to them. Keep login in a sidebar on desktop and make it easy to use on smaller screens. Explain the limits of this kind of classroom login.”
+
+Implementation summary:
+Accounts have a client or agent role. The app stores demo account information and a login session in the browser. Passwords are represented by salted hashes rather than plain text. A client is connected to their requests through an account ID. Agents can review the shared list and add responses. This is browser-based demonstration access control, not secure authentication for real customers.
+
+ROUND 4 — CHECKING THE ASSIGNMENT REQUIREMENTS
+Reconstructed example prompt:
+“Review Concord Desk against the assignment. Make sure it demonstrates persistence, real-time calculations, a chart, and meaningful branching choices. Check the layout on mobile and desktop, and check that users receive feedback when something succeeds or fails. Help me understand how the code connects these features.”
+
+Implementation summary:
+The project demonstrates all five listed mechanics: saved state, dynamic scheduling calculations, an updating chart, branching booking questions, and an agent board with drag-and-drop status changes. The board also has status menus for keyboard and touch use. The assignment requires at least three mechanics. Codex also reviewed the interface and added automated checks for important state and account behavior. These checks support the project; they do not guarantee a particular grade.
+
+ACTUAL PROMPT EXCERPTS
+These excerpts are copied from my messages and preserve their original wording. They provide exact examples alongside the reconstructed prompts above.
+
+From my initial request:
+“My goal is to make a website for real estate agents in concord, MA.”
+“Wait but can you make sure it is not a real one yet. Like my teacher said, just fake up clients instead of the real world application right now.”
+
+From my account request:
+“Ok. Can you create the password and account login for the clients and the real estate.”
+
+======================================================================
+3. CODE CORRECTIONS AND REFINEMENTS
+======================================================================
+I used follow-up prompts to make the website more consistent with the experience I wanted. The prompts below include exact excerpts from my messages, followed by summaries of the changes. Two specific code bugs found during development are documented afterward.
+
+A. CONFIRMING APPOINTMENT CANCELLATION
+Exact prompt excerpts:
+“Add a confirmation modal before deleting an appointment.”
+“Only delete the appointment data after user clicks "Confirm Cancel".”
+
+What changed:
+The app opens a dialog with the message: “Are you sure you want to cancel this appointment? This action cannot be undone.” It offers “Confirm Cancel” and “Keep Appointment.” Opening the dialog does not change the data. Keeping the appointment closes it without deleting anything. Confirming checks permission again and saves the deletion before updating the screen. If saving fails, the appointment stays in place. A successful cancellation displays a success toast.
+
+Why I requested it:
+A cancellation button should give someone a chance to reconsider before their appointment disappears.
+
+B. FIXING THE LOGIN LAYOUT
+Exact prompt excerpt:
+“The login modal should be vertically and horizontally centered on all screen sizes (mobile, tablet) but on sidebar of desktop.”
+
+What changed:
+Desktop keeps the login sidebar. Smaller screens use a fixed backdrop and flexbox centering, with a maximum card width and space around the edges. Tall content can scroll on short screens. This helps the form remain usable without losing the original style.
+
+C. RESTRICTING THE AGENT WORKSPACE
+Exact prompt:
+“When the user login as a client or not login, he shouldn't see the 'agent workspace'page. This page can be accessesd only by an agent user role. Is this valid? Mkae the change if it is.”
+
+What changed:
+Only an agent can open the agent workspace and statistics. Clients see their own requests and booking form. Guests can explore the client preview but cannot open the agent dashboard. The app checks the role when choosing a page and when performing protected actions. Manually navigating to a forbidden page redirects the user and displays: “You do not have permission to access this page.”
+
+This revised my earlier idea of letting visitors preview both pages. It was a change in my requirements, rather than a claim that the original preview behavior was an accidental bug.
+
+D. ADDING A BRANCHING REQUEST FLOW
+Exact prompt excerpts:
+“Turn this "Let's connect." form into a clear Branching Scenarios flow for a real estate website. Keep the existing light green UI style, card layout, and clean minimalist design.”
+“All changes must be saved in localStorage so the branch progress is not lost on page reload.”
+
+What changed:
+Contact methods show different questions: a phone number for calls, a location for meetings, and an email address for scheduled emails. The client's goal creates another branch, such as a selling timeline, a property type, or whether they have an address for a valuation. A “Your Current Path” display updates with those choices. Continue and Back buttons lead through the questions, scheduling, and a summary with a recommended next step. The unfinished draft and its current step are saved separately from submitted bookings.
+
+Why I requested it:
+I wanted the choices to affect what happened next. The form should help a person explain their situation, rather than simply collect the same information from everyone.
+
+E. IMPROVING THE LOGIN SWITCH TEXT
+Exact prompt:
+“Can we make the font bigger for the switch between client and student login?”
+
+What changed:
+The client/agent login controls received larger, bold text and a larger minimum tap area. The actual website roles are client and agent; “student” was the wording in my message.
+
+TWO SPECIFIC AI-GENERATED CODE ISSUES AND THEIR CORRECTIONS
+
+Issue 1 — A delivered email could no longer receive a reply.
+The earlier request view hid the reply form for requests marked Completed. However, the simulated email-delivery action marks an email request Completed. Together, those rules meant an agent could lose the ability to respond after an email was delivered.
+
+How it was identified:
+Codex's code review compared the email automation status change with the rule that controlled whether the reply form appeared.
+
+How it was fixed:
+The reply form was allowed for non-cancelled requests, including completed email requests. This preserves the conversation after delivery without reopening the appointment. A regression check verified that the reply form remained available in that situation.
+
+Issue 2 — An invalid saved automation entry could break later processing.
+The earlier saved-state validation checked that automation was an array, but did not fully check the objects inside it. An entry such as null could pass that shallow check, then cause an error when later code tried to read its properties.
+
+How it was identified:
+Codex reviewed the saved-data validation and tested a malformed automation entry.
+
+How it was fixed:
+Validation now checks that each automation entry exists and has string values for key, client, and kind. It also checks that autoConfirm is a boolean. A regression check verifies that malformed automation data is rejected.
+
+These are code corrections documented during development. They are separate from my design preferences, such as font size or the decision to restrict the agent workspace.
+
+======================================================================
+4. ARCHITECTURE EXPLANATION: HOW DATA MOVES THROUGH THE APP
+======================================================================
+For this section, Codex inspected the project's actual app.js and auth.js files. The explanation below summarizes that code analysis.
+
+SHORT ARCHITECTURE SUMMARY
+Concord Desk runs in the browser. HTML provides the page structure, CSS controls the appearance, and JavaScript manages accounts, form choices, appointments, and screen updates. A client's choices first become a saved draft. After validation and submission, that draft becomes a request in the application's main state. The app saves that state in localStorage and uses it to display the client's personal requests or the agent's shared workspace. Messages and status changes update those same request records. Statistics and chart bars are calculated from the current state, so they stay connected to the appointment list.
+
+1. STARTUP: RESTORING SAVED DATA
+When the website opens, the app reads the main state from the localStorage key concord-desk-v1. That state contains requests, automation activity, and the automatic-confirmation setting. The app checks the saved structure before using it. If the data is missing or fails validation, it uses fictional sample data. This is why the demonstration can start with content while still remembering valid changes after a reload.
+
+2. LOGIN: DECIDING WHO IS USING THE APP
+The account list uses concord-demo-accounts-v1. The session uses concord-demo-session-v1 and includes the account ID, role, login flag, and expiration time. The session expires after eight hours. The app matches the session to an existing account before treating someone as logged in.
+
+The role affects both navigation and available actions. A client can create a booking and access their own requests. An agent can manage the shared workspace. Hiding a navigation button is only part of the behavior: the JavaScript also checks the role when rendering restricted views and handling actions.
+
+3. FORM INPUT: BUILDING A DRAFT
+The booking flow keeps a draft containing the contact method, goal, follow-up choice, contact information, agent, date, time, and note. Changes update the visible path and recommended next step. The current step and draft are saved under concord-branch-v2: followed by the account ID, or guest for an unsigned visitor.
+
+Keeping drafts separate from appointments matters. Someone can explore the form or change their mind without creating a booking in the agent's list. Reloading can restore their progress. When a client logs in, an existing guest draft can be adopted if that client does not already have a saved draft.
+
+4. SUBMISSION: TURNING A DRAFT INTO AN APPOINTMENT
+Before submission, the app checks the required branch answers, the date and time, the client's login, and appointment availability. Calls and meetings cannot occupy the same active time slot for the same agent. Scheduled emails do not block appointment slots.
+
+The submit button shows a saving state. Before the delayed save completes, the code checks the account and availability again. A valid request receives a unique ID, the client's account ID, the selected details, a status, and an initial message. It is added to the requests array, saved, and displayed. The flow then shows the saved-request state.
+
+5. DISPLAY: TWO VIEWS OF THE SAME REQUEST DATA
+A client's list is filtered by ownership. New requests use clientId; older sample records can be matched by the client's name for compatibility. Agents see the shared list. Both views use the same main request state, so the app does not need separate copies of each appointment for the client and agent.
+
+When someone sends a permitted reply, the app adds an entry to that request's messages array, saves the state, and redraws the relevant view. Changing a status follows a similar path, with role and scheduling checks where needed.
+
+6. CALCULATIONS AND THE CHART
+Scheduling calculations compare the selected date, time, and agent with existing active requests. The dashboard calculates counts from current statuses. The chart groups non-cancelled requests by contact method and scales its bars from those counts. The displayed time-saved estimate uses five minutes per recorded automation action; it is an illustrative classroom estimate, not measured business performance.
+
+The chart is calculated from the request data rather than stored as a separate set of totals. That avoids having to manually update both an appointment and an unrelated chart value.
+
+7. SIMULATED AUTOMATION AND CANCELLATION
+When an agent runs the demo automation, eligible requests receive a simulated reminder or email message. Each recorded action has a key combining the request ID and action type, which prevents duplicate messages from repeated runs. Simulated email delivery marks that request Completed. No real email or phone call is sent, and this is not a background scheduling service.
+
+Cancellation takes a different route: the app first stores which appointment is awaiting confirmation. It does not remove the appointment at that point. Confirm Cancel checks ownership or agent permission again, builds the updated request list, and writes it to localStorage. Only after that succeeds does it replace the in-memory state and show success.
+
+8. WHAT PERSISTENCE DOES AND DOES NOT MEAN
+localStorage belongs to a browser and website origin. Tabs on the same origin can respond to storage events and refresh their displayed data. A teacher on another device gets their own demonstration data; the teacher does not automatically receive my local appointments or accounts.
+
+There is no shared server database, and users can edit browser storage themselves. The role checks demonstrate the intended experience, but they are not production security. Likewise, ordinary save failures can leave some changes available only for the current session; cancellation specifically preserves the appointment if saving the deletion fails.
+
+My main takeaway from the data-flow explanation is that the screens are connected through shared state. A button does more than change what appears on the page: it can validate a choice, update a record, save it, and cause several parts of the interface to be recalculated. Understanding that sequence helps me explain why the client view, agent list, and chart change together.
