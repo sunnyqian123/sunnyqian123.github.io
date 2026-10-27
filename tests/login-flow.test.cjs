@@ -1,0 +1,27 @@
+const assert=require('assert'),setup=require('./harness.cjs');
+(async()=>{let t=setup(),run=t.run;await run('authReady');let n=0;function test(name,s){assert.ok(run(s),name);console.log('PASS '+name);n++;}
+test('Guest can browse fictional preview',"document.querySelector('#app').innerHTML.includes('Take a look around.')");
+test('Guest agent navigation hidden',"document.querySelector('#business-nav').hidden");
+run("location.hash='#business';render()");test('Guest direct agent URL is denied',"location.hash==='#client'&&businessView()===''&&workspaceContent()===''&&chart()===''");test('Agent login available without dashboard',"document.querySelector('#app').innerHTML.includes('Real estate agent login')&&!document.querySelector('#app').innerHTML.includes('Your workspace')");
+await run("signIn('alex@example.com','ClientDemo123!','client');");run('render()');
+test('Client sees own list, no global chart',"document.querySelector('#app').innerHTML.includes('Requests & conversations')&&!document.querySelector('#app').innerHTML.includes('Jordan Lee')&&!document.querySelector('#app').innerHTML.includes('Conversations, at a glance')");
+test('Client agent navigation hidden',"document.querySelector('#business-nav').hidden");
+run("location.hash='#business';render()");test('Unauthorized client route redirects with exact error',"location.hash==='#client'&&document.querySelector('#toast').textContent==='You do not have permission to access this page.'");
+run("changeStatus('sample-2','Completed')");test('Client cannot mutate another appointment',"state.requests[1].status==='Pending'");
+run("requestCancellation('sample-1')");test('Cancel only opens confirmation',"document.querySelector('#cancel-dialog').open&&state.requests.length===3");
+run('closeCancellation()');test('Keep leaves appointment unchanged',"state.requests.length===3&&!document.querySelector('#cancel-dialog').open");
+run("requestCancellation('sample-2')");test('Client cannot cancel another client request','pendingCancellation===null');
+run("requestCancellation('sample-1')");t.blockStorage(true);run('confirmCancellation()');t.blockStorage(false);test('Storage failure preserves appointment',"state.requests.length===3&&document.querySelector('#cancel-error').textContent.includes('kept')");
+run('confirmCancellation()');test('Confirm removes only selected request and persists',"state.requests.length===2&&!state.requests.some(r=>r.id==='sample-1')&&JSON.parse(localStorage.getItem(KEY)).requests.length===2");
+test('Cancellation success toast',"document.querySelector('#toast').textContent==='Appointment cancelled successfully.'");
+run("draft={...defaultDraft(),phone:'202-555-0142',goal:'Sell a home',detail:'3–6 months'};step=2;saveDraft()");
+t=setup(t.shared);run=t.run;await run('authReady');test('Branch progress restores on reload',"step===2&&draft.phone==='202-555-0142'&&currentPath()==='Phone call → Sell a home → 3–6 months'");
+run("step=3");test('Summary shows recommended next step',"bookingView().includes('Summary of Your Request')&&bookingView().includes(recommendation())");
+run("draft.type='Meeting';draft.meetingLocation='Home visit';step=1");test('Meeting branch displays location',"bookingView().includes('Preferred meeting location?')&&recommendation().includes('home visit')");
+run("draft.type='Email';draft.email='alex@example.com'");test('Email branch validates and displays',"branchError()===''&&bookingView().includes('What is the best email address for you?')");
+run("draft.goal='Get a valuation';draft.detail='Yes';draft.address=''");test('Valuation branch requires address',"branchError().includes('property address')");run("draft.detail='Not yet'");test('Valuation alternate branch works',"branchError()===''&&recommendation().includes('identify')");
+run("draft.goal='Rent a property';draft.detail='Apartment'");test('Rental branch works',"detailOptions().includes('Townhouse')&&recommendation().includes('rental budget')");
+run("draft.goal='Buy a home';draft.detail='Land'");test('Buy branch has exact choices',"detailOptions().join(',')==='Apartment,House,Villa,Land'&&recommendation().includes('land')");
+await run("signIn('agent@example.com','AgentDemo123!','agent')");run("location.hash='#client';render()");test('Agent redirected away from client form',"location.hash==='#business'&&bookingView()===''&&!document.querySelector('#app').innerHTML.includes('booking-form')");test('Agent sees chart and shared requests',"document.querySelector('#app').innerHTML.includes('Conversations, at a glance')&&document.querySelector('#app').innerHTML.includes('Jordan Lee')");test('Agent booking nav hidden',"document.querySelector('#client-nav').hidden");
+run("changeStatus('sample-2','Cancelled')");test('Status-menu cancellation also confirms',"pendingCancellation.id==='sample-2'&&state.requests.some(r=>r.id==='sample-2')");run('closeCancellation()');
+console.log(n+' integration checks passed.');})().catch(e=>{console.error(e);process.exitCode=1;});
